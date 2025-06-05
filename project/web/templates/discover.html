@@ -1,0 +1,263 @@
+{{ define "content" }}
+<h1>Discover Movies</h1>
+
+<style>
+    .movie-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        list-style: none;
+        padding-left: 100px;
+    }
+
+    .movie-card {
+        width: 200px;
+    }
+
+    .movie-poster {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .top-reviewed-container {
+        background-color: #fff9e6;
+        padding: 20px;
+        border-radius: 8px;
+        margin-left: 270px; 
+    }
+
+    .top-reliesed-container{
+        background-color: #fff9e6;
+        padding: 20px;
+        border-radius: 8px;
+        margin-left: 270px; 
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #f4f4f4;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        overflow-y: auto;
+    }
+
+    .main-content {
+        margin-left: 270px; 
+        padding: 20px;
+    }
+
+    .-movielist {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        list-style: none;
+        padding-left: 0;
+        margin-top: 10px;
+    }
+
+    #rating-value {
+        display: inline-block;
+        width: 1em;
+        text-align: right;
+    }
+
+    .genre-link {
+        display: block;
+        margin: 10px 0;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .genre-link:hover {
+        text-decoration: underline;
+    }
+
+    .genre-toggle {
+        display: none;
+    }
+</style>
+
+<div class="sidebar">
+    <h3>Genres</h3>
+    <a class="genre-link dynamic-genre" href="/discover/">All genres</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=28">Action</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=12">Adventure</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=16">Animation</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=35">Comedy</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=80">Crime</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=99">Documentary</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=18">Drama</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=10751">Family</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=14">Fantasy</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=27">Horror</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=9648">Mystery</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=10749">Romance</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=878">Science Fiction</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=10770">TV Movie</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=53">Thriller</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=10752">War</a>
+    <a class="genre-link dynamic-genre" href="/discover/?genre=37">Western</a>
+
+    <div class="years-filter">
+        <h3>Фильтр по году:</h3>
+        <label for="years"> Year: </label>
+        <select id="years" name="years" onchange="updateYearFilter(this.value)">
+            <option value="">All years</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2021">2021</option>
+            <option value="2018">2018</option>
+            <option value="2017">2017</option>
+            <option value="2012">2012</option>
+            <option value="2006">2006</option>
+            <option value="2005">2005</option>
+            <option value="2003">2003</option>
+            <option value="2002">2002</option>
+            <option value="2000">2000</option>
+            <option value="1996">1996</option>
+            <option value="1990">1990</option>
+            <option value="1985">1985</option>
+            <option value="1979">1979</option>
+            <option value="1972">1972</option>
+        </select>
+    </div>
+
+    <div class = "rating-filter">
+        <h3>Film rating:</h3>
+        <label for="ratingRange">Rating: <span id = "rating-value">0</span></label>
+        <input type="range" id="ratingRange" name="rating" min="0" max="5" step="0.1" value="0" oninput="updateRatingDisplay(this.value)" onchange="updateRatingFilter(this.value)">
+    </div>
+</div>
+
+<script>
+function updateRatingDisplay(value){
+    document.getElementById('rating-value').textContent=value;
+}
+
+function getUrlParam(name) {
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
+}
+
+// Установка выбранных параметров
+document.addEventListener('DOMContentLoaded', function() {
+    const rating = getUrlParam('rating');
+    const ratingInput = document.getElementById('ratingRange');
+    const ratingDisplay = document.getElementById('rating-value');
+
+    if (rating) {
+        ratingInput.value = rating;
+        ratingDisplay.textContent = rating;
+    } else {
+        ratingInput.value = 0;
+        ratingDisplay.textContent = '0';
+    }
+
+    const year = getUrlParam('year');
+    const select = document.getElementById('years');
+    
+    if (year) {
+        select.value = year;
+    }
+    const genreLinks = document.querySelectorAll('.genre-link.dynamic-genre');
+    genreLinks.forEach(link => {
+        const url = new URL(link.href, window.location.origin);
+        if(rating){
+            url.searchParams.set('rating', rating);
+        }
+        if(year){
+            url.searchParams.set('year', year);
+        }
+        link.href = url.toString()
+    });
+
+});
+
+function updateRatingFilter(rating) {
+    const url = new URL(window.location.href);
+    const year = getUrlParam('year');
+    const genre = getUrlParam('genre');
+
+    if (rating && parseFloat(rating) > 0) {
+        url.searchParams.set('rating', rating);
+    } else {
+        url.searchParams.delete('rating');
+    }
+
+    if (year) url.searchParams.set('year', year);
+    if (genre) url.searchParams.set('genre', genre);
+
+    window.location.href = url.toString();
+}
+
+function updateYearFilter(year) {
+    const url = new URL(window.location.href);
+    const rating = getUrlParam('rating');
+    const genre = getUrlParam('genre');
+
+    if (year) {
+        url.searchParams.set('year', year);
+    } else {
+        url.searchParams.delete('year');
+    }
+
+    if (rating) url.searchParams.set('rating', rating);
+    if (genre) url.searchParams.set('genre', genre);
+
+    window.location.href = url.toString();
+}
+</script>
+
+<div class ="top-reliesed-container">
+    <h2 style="padding-left: 220px;">🎬 Newest release</h2>
+    <ul class="movie-list">
+        {{range .Newest}}
+        <li class="movie-card">
+            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
+                <img class="movie-poster" src="{{.PosterUrl}}" alt="{{.Name}}">
+                <div><strong>{{ .Name }}</strong></div>
+                <div>{{.ReleaseDate.Format "2006-01-02"}}</div>
+                <p>Reviews: {{.ReviewCount}}</p>
+            </a>
+        </li>
+        {{end}}
+    </ul>
+</div>
+
+
+<div class ="top-reviewed-container">
+    <h2 style="padding-left: 220px;">🔥 Top 6 Most Reviewed Movies</h2>
+    <ul class="movie-list">
+        {{ range .TopReviewed }}
+        <li class="movie-card">
+            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
+                <img class="movie-poster" src="{{ .PosterUrl }}" alt="{{ .Name }}">
+                <div><strong>{{ .Name }}</strong></div>
+                <div>Reviews: {{ .ReviewCount }}</div>
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
+<div class="main-content">
+    <h2 style="padding-left: 220px;">🎬 All Movies: {{ .Genre }}</h2>
+    <ul class="movie-list">
+        {{ range .Movies}}
+        <li class="movie-card">
+            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
+                <img class="movie-poster" src="{{ .PosterUrl }}" alt="{{ .Name }}">
+                <div>{{ .Name }}</div>
+                <div>{{ .ReleaseDate.Format "2006-01-02" }}</div>
+                <p>Reviews: {{ .ReviewCount }}</p>
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+    {{ end }}
+</div>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head><title>{{ block "title" . }} Default title {{ end }}</title></head>
+    <body>
+        <header>
+            <h1>Welcome Home</h1>
+            <nav><a href="/">Home</a> | <a href="/discover">Discover</a></nav>
+        </header>
+
+        {{ block "content" . }}{{ end }}
+
+        <footer>
+            <hr>
+        </footer>
+    </body>
+</html>

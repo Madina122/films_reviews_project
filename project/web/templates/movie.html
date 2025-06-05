@@ -1,0 +1,193 @@
+{{ define "content" }}
+<style>
+    .movie-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 30px;
+        max-width: 900px;
+        margin: 40px auto;
+    }
+ 
+    .movie-poster {
+        width: 300px;
+        border-radius: 12px;
+    }
+
+    .movie-info {
+        flex: 1;
+    }
+
+    .movie-title {
+        margin-top: 0;
+        font-size: 2em;
+    }
+
+    .movie-description {
+        margin-top: 20px;
+        font-size: 1.1em;
+        line-height: 1.5;
+    }
+
+    .back-link {
+        display: block;
+        margin: 40px auto;
+        text-align: center;
+    }
+</style>
+
+<script>
+    function getCookie(name) {
+        const value = "; " + document.cookie;
+        const parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+        return null;
+    }
+
+    function setCookie(name, value) {
+        document.cookie = name + "=" + encodeURIComponent(value) + "; path=/";
+    }
+
+    function openLoginModal(targetFormId) {
+        const modal = document.getElementById("loginModal");
+        modal.style.display = "block";
+        modal.dataset.target = targetFormId;
+
+        const savedLogin = getCookie("userLogin");
+        if (savedLogin) {
+            const form = document.getElementById(targetFormId);
+            const loginInput = form.querySelector("input[name='login']");
+            if (loginInput) {
+                loginInput.value = savedLogin;
+            }
+            closeLoginModal();
+            form.submit();
+            return;
+        }
+        document.getElementById("modalLogin").value = "";
+    }
+
+    function closeLoginModal() {
+        document.getElementById("loginModal").style.display = "none";
+    }
+
+    function submitFormWithLogin() {
+        const loginInputModal = document.getElementById("modalLogin");
+        const login = loginInputModal.value.trim();
+        if (login === "") {
+            alert("Пожалуйста, введите логин");
+            return;
+        }
+
+        setCookie("userLogin", login);
+
+        const formId = document.getElementById("loginModal").dataset.target;
+        const form = document.getElementById(formId);
+        const loginInput = form.querySelector("input[name='login']");
+        if (loginInput) {
+            loginInput.value = login;
+        }
+
+        closeLoginModal();
+        form.submit();
+    }
+
+    window.onload = function() {
+        const savedLogin = getCookie("userLogin");
+        if (savedLogin) {
+            const ratingLoginInput = document.getElementById("ratingLoginInput");
+            if (ratingLoginInput) {
+                ratingLoginInput.value = savedLogin;
+            }
+            const reviewLoginInput = document.getElementById("reviewLoginInput");
+            if (reviewLoginInput) {
+                reviewLoginInput.value = savedLogin;
+            }
+        }
+    };
+</script>
+
+
+<div id="loginModal" style="display:none; position:fixed; top:0; left:0;
+    width:100%; height:100%; background:rgba(0,0,0,0.5);">
+    <div style="background:#fff; padding:20px; border-radius:10px;
+        width:300px; margin:100px auto; position:relative;">
+        <h3>Введите ваш логин</h3>
+        <input type="text" id="modalLogin" required style="width: 100%; padding: 8px;">
+        <div style="margin-top:10px; text-align:right;">
+            <button onclick="closeLoginModal()">Отмена</button>
+            <button onclick="submitFormWithLogin()">OK</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="movie-container">
+    <img class="movie-poster" src="{{ .Movie.PosterUrl }}" alt="Poster for {{ .Movie.Name }}">
+    <div class="movie-info">
+        <h1 class="movie-title">{{ .Movie.Name }}({{ .Movie.ReleaseDate.Year }})</h1>
+        <p class="movie-description">{{ .Movie.Description }}</p>
+        <p><strong>Средняя оценка: </strong>{{ printf "%.2f" .Avarage }}</p>
+
+        <h3>Распределение оценок: </h3>
+        <ul>
+            {{ if .RatingCounts }}
+                {{ range $star, $count := .RatingCounts }}
+                    <li>{{ repeat "★"  $star }} — {{ $count }} оценки(а)</li>
+                {{ end }}
+            {{ else }}
+                <li>Нет оценок</li>
+            {{ end }}
+        </ul>
+
+        <form id="ratingForm" action="/add-rating" method="post">
+            <input type="hidden" name="movie_id" value="{{ .Movie.Id }}">
+            <input type="hidden" name="login" id="ratingLoginInput">
+            <input type="hidden" name="genre" value="{{ .GenreId }}">
+            <input type="hidden" name="year" value="{{ .Year }}">
+            <input type="hidden" name="rating" value="{{ .Rating }}">
+
+            <label for="Rating">Ваша оценка: </label>
+            <select name="Rating" id="Rating" required>
+                <option value="" disabled selected>Выберите оценку</option>
+                {{ range $i := seq 1 5 }}
+                    <option value="{{ $i }}">{{ $i }} ★</option>
+                {{ end }}
+            </select>
+
+            <button type="button" onclick="openLoginModal('ratingForm')">Оценить</button>
+        </form>
+    </div>
+</div>
+
+<form id = "reviewForm" action="/add-review" method="post">
+    <input type="hidden" name="movie_id" value="{{ .Movie.Id }}">
+    <input type="hidden" name = "login" id= "reviewLoginInput">
+    <input type="hidden" name="genre" value="{{ .GenreId }}">
+    <input type="hidden" name="year" value="{{ .Year }}">
+    <input type="hidden" name="rating" value="{{ .Rating }}">
+
+    <textarea name="Comment" placeholder="Напишите отзыв..." required></textarea>
+    <button type="button" onclick="openLoginModal('reviewForm')">Оставить отзыв</button>
+
+</form>
+
+<div class="reviews-section">
+    <h2>Отзывы:</h2>
+    <ul>
+        {{ range .Reviews }}
+            <li>
+                <strong>{{ .UserLogin }}</strong>: "{{ .Comment }}"<br>
+                Оценка: {{ .Rating }} ★<br>
+                <em>{{ .CreatedAt.Format "02 Jan 2006 15:04" }}</em>
+            </li>
+        {{ else }}
+            <li>Отзывов пока нет.</li>
+        {{ end }}
+    </ul>
+</div>
+
+<a href="/discover/?genre={{ .GenreId }}&year={{ .Year }}&rating={{ .Rating }}">← Назад к списку фильмов</a>
+
+
+{{ end }}
