@@ -454,6 +454,22 @@ function updateYearFilter(year) {
 }
 </script>
 
+<div class="main-content">
+    <h2>🎬 All Movies: {{ .Genre }}</h2>
+    <ul class="movie-list">
+        {{ range .Movies}}
+        <li class="movie-card">
+            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
+                <img class="movie-poster" src="{{ .PosterUrl }}" alt="{{ .Name }}">
+                <div>{{ .Name }}</div>
+                <div>{{ .ReleaseDate.Format "2006-01-02" }}</div>
+                <p>Reviews: {{ .ReviewCount }}</p>
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
 <div class="top-reviewed-container">
     <h2>🔥 Top 6 Most Reviewed Movies</h2>
     <ul class="movie-list">
@@ -484,4 +500,5 @@ function updateYearFilter(year) {
         {{end}}
     </ul>
 </div>
+
 {{ end }}
