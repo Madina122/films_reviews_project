@@ -14,7 +14,7 @@ var db *sql.DB
 
 func MakeDbConnection() error {
 	var err error
-	connStr := "user=postgres password=1101Mado! dbname=project_go sslmode=disable"
+	connStr := "user=postgres password=YOUR_PASSWORD dbname=project_go sslmode=disable"
 	dbTmp, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return err

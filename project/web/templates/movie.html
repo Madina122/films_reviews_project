@@ -653,7 +653,6 @@
     <ul>
         {{ range .Reviews }}
             <li>
-<<<<<<< HEAD
                 <strong>{{ .UserLogin }}</strong>: "{{ .Comment }}"
                 <span class="review-date">{{ .CreatedAt.Format "02 Jan 2006 15:04" }}</span><br>
                 {{ $rating := .Rating }}
@@ -668,11 +667,6 @@
                     {{ end }}
                 {{ end }}
                 <br>
-=======
-                <strong>{{ .UserLogin }}</strong>: "{{ .Comment }}"<br>
-                Rating: {{ .Rating }} ★<br>
-                <em>{{ .CreatedAt.Format "02 Jan 2006 15:04" }}</em>
->>>>>>> e89089cc3325b223a106c9001121984d444915cc
             </li>
         {{ else }}
             <li>No yet reviews.</li>
