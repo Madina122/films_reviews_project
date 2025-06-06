@@ -21,9 +21,13 @@ func repeat(s string, count int) string {
 func seq(start, end int) []int {
 	s := make([]int, end-start+1)
 	for i := range s {
-		s[i] = start + i
+		s[i] = start + 1
 	}
 	return s
+}
+
+func add(a, b int) int {
+	return a + b
 }
 
 var templates struct {
@@ -41,6 +45,7 @@ func InitTemplates() error {
 	funcMap := template.FuncMap{
 		"seq":    seq,
 		"repeat": repeat,
+		"add":    add,
 	}
 
 	templates.Main = template.Must(template.New("base.html").
@@ -105,6 +110,7 @@ func RenderMoviePage(w http.ResponseWriter, movie Movie, genreStr string, yearSt
 		GenreId      string
 		Year         string
 		Rating       string
+		FiveStars    []int
 	}{
 		Movie:        movie,
 		Reviews:      reviews,
@@ -113,6 +119,7 @@ func RenderMoviePage(w http.ResponseWriter, movie Movie, genreStr string, yearSt
 		GenreId:      genreStr,
 		Year:         yearStr,
 		Rating:       ratingStr,
+		FiveStars:    []int{1, 2, 3, 4, 5},
 	}
 
 	err = templates.Movie.Execute(w, data)

@@ -36,7 +36,7 @@ type Review struct {
 	UserId    int
 	Rating    int
 	Comment   string
-	СreatedAt time.Time
+	CreatedAt time.Time
 }
 
 type ReviewWithUser struct {
@@ -226,7 +226,7 @@ func HandleAddRating(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ratingStr := r.FormValue("Rating")
+	ratingStr := r.FormValue("rating")
 	genreStr := r.FormValue("genre")
 	yearStr := r.FormValue("year")
 	selratingStr := r.FormValue("rating")

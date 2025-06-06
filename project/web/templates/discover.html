@@ -2,7 +2,6 @@
 <h1>Discover Movies</h1>
 
 <style>
-    /* основные стили */
     :root {
         --dark-bg: #121212;
         --card-bg: #1e1e1e;
@@ -10,6 +9,8 @@
         --light-accent: #f8e6c0;
         --text: #f5f5f5;
         --border: #333;
+        --button-bg: #2c2c2c;
+        --button-hover: #3a3a3a;
     }
     
     body {
@@ -46,7 +47,8 @@
         padding: 20px;
         box-shadow: 3px 0 10px rgba(0,0,0,0.3);
         overflow-y: auto;
-        z-index: 100;
+        z-index: 1000;
+        transition: all 0.3s ease;
     }
     
     .sidebar h3 {
@@ -54,8 +56,59 @@
         margin-bottom: 15px;
         padding-bottom: 8px;
         border-bottom: 1px solid var(--border);
+        margin-top: 40px;
     }
     
+    .toggle-sidebar {
+        background-color: var(--button-bg);
+        color: var(--text);
+        border: none;
+        padding: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        border-radius: 5px;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1100;
+        transition: background-color 0.3s, left 0.3s ease;
+    }
+
+    .sidebar.collapsed ~ .toggle-sidebar {
+        left: 10px;
+    }
+
+    .sidebar:not(.collapsed) ~ .toggle-sidebar {
+        left: 260px;
+    }
+
+    .toggle-sidebar:hover {
+        background-color: var(--button-hover);
+    }
+
+    .sidebar.collapsed {
+        width: 0;
+        padding: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed ~ .top-reliesed-container,
+    .sidebar.collapsed ~ .top-reviewed-container,
+    .sidebar.collapsed ~ .main-content {
+        margin-left: 0;
+        transition: margin-left 0.3s ease;
+    }
+
+    .sidebar.collapsed ~ .top-reliesed-container h2,
+    .sidebar.collapsed ~ .top-reviewed-container h2,
+    .sidebar.collapsed ~ .main-content h2 {
+        padding-left: 0;
+        text-align: center; 
+    }
+
     .genre-link {
         display: block;
         margin: 12px 0;
@@ -113,7 +166,6 @@
         text-align: center;
     }
     
-    /* контейнеры с фильмами */
     .top-reviewed-container, 
     .top-reliesed-container,
     .main-content {
@@ -124,16 +176,28 @@
         margin-bottom: 30px;
         border: 1px solid #383838;
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transition: margin-left 0.3s ease;
+    }
+
+    .top-reliesed-container h2,
+    .top-reviewed-container h2,
+    .main-content h2 {
+        text-align: center;  
+        margin-top: 10px; 
+        margin-bottom: 20px; 
     }
     
     .movie-list {
         display: flex;
         flex-wrap: wrap;
+        justify-content: center; 
         gap: 25px;
         list-style: none;
-        padding: 0;
-        margin: 0;
+        padding: 20px; 
+        margin: 0 auto; 
+        max-width: 1200px;
     }
+
     
     .movie-card {
         width: 200px;
@@ -143,6 +207,17 @@
         transition: all 0.3s ease;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
+
+    @media (max-width: 768px) {
+  .movie-card {
+    width: 100%;
+  }
+
+  .movie-list {
+    justify-content: center;
+  }
+}
+
     
     .movie-card:hover {
         transform: translateY(-7px);
@@ -183,7 +258,6 @@
         font-size: 13px;
     }
     
-    /* заголовки секций */
     .section-header {
         display: flex;
         align-items: center;
@@ -198,23 +272,38 @@
         font-size: 24px;
     }
     
-    /* адаптивность */
     @media (max-width: 992px) {
         .sidebar {
-            position: relative;
-            width: 100%;
-            height: auto;
-            margin-bottom: 20px;
+            position: fixed;
+            width: 250px;
+            height: 100%;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
-        
+        .toggle-sidebar {
+            display: block;
+        }
         .top-reviewed-container, 
         .top-reliesed-container,
         .main-content {
             margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+        .sidebar:not(.collapsed) ~ .top-reliesed-container,
+        .sidebar:not(.collapsed) ~ .top-reviewed-container,
+        .sidebar:not(.collapsed) ~ .main-content {
+            margin-left: 270px;
+        }
+        .top-reliesed-container h2,
+        .top-reviewed-container h2,
+        .main-content h2 {
+            padding-left: 0;
+            text-align: center; 
         }
     }
 </style>
 
+<button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
 <div class="sidebar">
     <h3>Genres</h3>
     <a class="genre-link dynamic-genre" href="/discover/">🎬 All genres</a>
@@ -272,6 +361,21 @@
 </div>
 
 <script>
+function toggleSidebar() {
+    try {
+        const sidebar = document.querySelector('.sidebar');
+        const toggleButton = document.querySelector('.toggle-sidebar');
+        if (!sidebar || !toggleButton) {
+            console.error('Sidebar or toggle button not found');
+            return;
+        }
+        sidebar.classList.toggle('collapsed');
+        toggleButton.textContent = sidebar.classList.contains('collapsed') ? '☰' : '✕';
+    } catch (error) {
+        console.error('Error in toggleSidebar:', error);
+    }
+}
+
 function updateRatingDisplay(value){
     document.getElementById('rating-value').textContent=value;
 }
@@ -281,7 +385,6 @@ function getUrlParam(name) {
     return url.searchParams.get(name);
 }
 
-// Установка выбранных параметров
 document.addEventListener('DOMContentLoaded', function() {
     const rating = getUrlParam('rating');
     const ratingInput = document.getElementById('ratingRange');
@@ -312,7 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         link.href = url.toString()
     });
-
 });
 
 function updateRatingFilter(rating) {
@@ -350,8 +452,39 @@ function updateYearFilter(year) {
 }
 </script>
 
-<div class ="top-reliesed-container">
-    <h2 style="padding-left: 220px;">🎬 Newest release</h2>
+<div class="main-content">
+    <h2>🎬 All Movies: {{ .Genre }}</h2>
+    <ul class="movie-list">
+        {{ range .Movies}}
+        <li class="movie-card">
+            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
+                <img class="movie-poster" src="{{ .PosterUrl }}" alt="{{ .Name }}">
+                <div>{{ .Name }}</div>
+                <div>{{ .ReleaseDate.Format "2006-01-02" }}</div>
+                <p>Reviews: {{ .ReviewCount }}</p>
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
+<div class="top-reviewed-container">
+    <h2>🔥 Top 6 Most Reviewed Movies</h2>
+    <ul class="movie-list">
+        {{ range .TopReviewed }}
+        <li class="movie-card">
+            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
+                <img class="movie-poster" src="{{ .PosterUrl }}" alt="{{ .Name }}">
+                <div><strong>{{ .Name }}</strong></div>
+                <div>Reviews: {{ .ReviewCount }}</div>
+            </a>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
+<div class="top-reliesed-container">
+    <h2 class>🎬 Newest release</h2>
     <ul class="movie-list">
         {{range .Newest}}
         <li class="movie-card">
@@ -366,35 +499,4 @@ function updateYearFilter(year) {
     </ul>
 </div>
 
-
-<div class ="top-reviewed-container">
-    <h2 style="padding-left: 220px;">🔥 Top 6 Most Reviewed Movies</h2>
-    <ul class="movie-list">
-        {{ range .TopReviewed }}
-        <li class="movie-card">
-            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
-                <img class="movie-poster" src="{{ .PosterUrl }}" alt="{{ .Name }}">
-                <div><strong>{{ .Name }}</strong></div>
-                <div>Reviews: {{ .ReviewCount }}</div>
-            </a>
-        </li>
-        {{ end }}
-    </ul>
-</div>
-
-<div class="main-content">
-    <h2 style="padding-left: 220px;">🎬 All Movies: {{ .Genre }}</h2>
-    <ul class="movie-list">
-        {{ range .Movies}}
-        <li class="movie-card">
-            <a href="/movies/?id={{ .Id }}&genre={{$.GenreID}}&year={{$.Year}}&rating={{$.Rating}}">
-                <img class="movie-poster" src="{{ .PosterUrl }}" alt="{{ .Name }}">
-                <div>{{ .Name }}</div>
-                <div>{{ .ReleaseDate.Format "2006-01-02" }}</div>
-                <p>Reviews: {{ .ReviewCount }}</p>
-            </a>
-        </li>
-        {{ end }}
-    </ul>
-    {{ end }}
-</div>
+{{ end }}
