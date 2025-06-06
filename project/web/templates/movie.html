@@ -511,11 +511,11 @@
     width:100%; height:100%; background:rgba(0,0,0,0.5);">
     <div style="background:#fff; padding:20px; border-radius:10px;
         width:300px; margin:100px auto; position:relative;">
-        <h3>Введите ваш логин</h3>
+        <h3>Enter your username</h3>
         <input type="text" id="modalLogin" required style="width: 100%; padding: 8px;">
         <div style="margin-top:10px; text-align:right;">
-            <button onclick="closeLoginModal()">Отмена</button>
-            <button onclick="submitFormWithLogin()">OK</button>
+            <button onclick="closeLoginModal()" type="button">Cancel</button>
+            <button onclick="submitFormWithLogin()" type="button">OK</button>
         </div>
     </div>
 </div>
@@ -527,16 +527,16 @@
     <div class="movie-info">
         <h1 class="movie-title">{{ .Movie.Name }}({{ .Movie.ReleaseDate.Year }})</h1>
         <p class="movie-description">{{ .Movie.Description }}</p>
-        <p><strong>Средняя оценка: </strong>{{ printf "%.2f" .Avarage }}</p>
+        <p><strong>Average Rating: </strong>{{ printf "%.2f" .Avarage }}</p>
 
-        <h3>Распределение оценок: </h3>
+        <h3>Rating Distribution: </h3>
         <ul>
             {{ if .RatingCounts }}
                 {{ range $star, $count := .RatingCounts }}
-                    <li>{{ repeat "★"  $star }} — {{ $count }} оценки(а)</li>
+                    <li>{{ repeat "★"  $star }} — {{ $count }} rating(s)</li>
                 {{ end }}
             {{ else }}
-                <li>Нет оценок</li>
+                <li>No ratings</li>
             {{ end }}
         </ul>
 
@@ -547,15 +547,15 @@
             <input type="hidden" name="year" value="{{ .Year }}">
             <input type="hidden" name="rating" value="{{ .Rating }}">
 
-            <label for="Rating">Ваша оценка: </label>
+            <label for="Rating">Your Rating: </label>
             <select name="Rating" id="Rating" required>
-                <option value="" disabled selected>Выберите оценку</option>
+                <option value="" disabled selected>Select a rating</option>
                 {{ range $i := seq 1 5 }}
                     <option value="{{ $i }}">{{ $i }} ★</option>
                 {{ end }}
             </select>
 
-            <button type="button" class="btn" onclick="openLoginModal('ratingForm')">Оценить</button>
+            <button type="button" class="btn" onclick="openLoginModal('ratingForm')">Rate the movie</button>
         </form>
     </div>
 </div>
@@ -567,13 +567,13 @@
     <input type="hidden" name="year" value="{{ .Year }}">
     <input type="hidden" name="rating" value="{{ .Rating }}">
 
-    <textarea name="Comment" placeholder="Напишите отзыв..." required></textarea>
-    <button type="button" class="btn" onclick="openLoginModal('reviewForm')">Оставить отзыв</button>
+    <textarea name="Comment" placeholder="Write a review..." required></textarea>
+    <button type="button" class="btn" onclick="openLoginModal('reviewForm')">Leave a review</button>
 
 </form>
 
 <div class="reviews-section">
-    <h2>Отзывы:</h2>
+    <h2>Reviews:</h2>
     <ul>
         {{ range .Reviews }}
             <li>
@@ -587,7 +587,7 @@
     </ul>
 </div>
 
-<a href="/discover/?genre={{ .GenreId }}&year={{ .Year }}&rating={{ .Rating }}">← Назад к списку фильмов</a>
+<a href="/discover/?genre={{ .GenreId }}&year={{ .Year }}&rating={{ .Rating }}">← Back to movie list</a>
 
 
 {{ end }}
