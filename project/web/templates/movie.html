@@ -1,37 +1,437 @@
 {{ define "content" }}
 <style>
+    /* основные стили */
+    :root {
+        --dark-bg: #121212;
+        --card-bg: #1e1e1e;
+        --accent: #d4af37;
+        --light-accent: #f8e6c0;
+        --text: #f5f5f5;
+        --border: #333;
+    }
+    
+    body {
+        background-color: var(--dark-bg);
+        color: var(--text);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* контейнер фильма */
     .movie-container {
-        display: flex;
-        align-items: flex-start;
-        gap: 30px;
-        max-width: 900px;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 40px;
+        max-width: 1200px;
         margin: 40px auto;
+        padding: 0 20px;
     }
- 
+    
     .movie-poster {
-        width: 300px;
-        border-radius: 12px;
+        width: 100%;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        aspect-ratio: 2/3;
+        object-fit: cover;
     }
-
+    
     .movie-info {
-        flex: 1;
+        padding: 20px 0;
     }
-
+    
     .movie-title {
-        margin-top: 0;
-        font-size: 2em;
+        font-size: 2.5rem;
+        color: var(--light-accent);
+        margin-bottom: 5px;
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+        flex-wrap: wrap;
     }
-
+    
+    .movie-year {
+        color: var(--accent);
+        font-size: 1.4rem;
+        font-weight: 500;
+        padding-bottom: 5px;
+    }
+    
     .movie-description {
-        margin-top: 20px;
-        font-size: 1.1em;
-        line-height: 1.5;
+        line-height: 1.8;
+        margin: 30px 0;
+        color: #ddd;
+        font-size: 1.1rem;
+    }
+    
+    /* блок рейтинга */
+    .rating-summary {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border);
+    }
+    
+    .avg-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(212, 175, 55, 0.15);
+        padding: 10px 20px;
+        border-radius: 30px;
+        margin-bottom: 25px;
+    }
+    
+    .avg-rating-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--accent);
+    }
+    
+    .rating-distribution {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 25px 0;
+    }
+    
+    .rating-item {
+        background-color: #252525;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    
+    .rating-item:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stars {
+        color: var(--accent);
+        font-size: 1.3rem;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+    }
+    
+    .rating-count {
+        font-size: 1.1rem;
+        color: #aaa;
+    }
+    
+    /* формы */
+    .rating-form, .review-form-container {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border);
+    }
+    
+    .form-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        color: var(--light-accent);
+        font-size: 1.3rem;
+    }
+    
+    .form-title i {
+        font-size: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--light-accent);
+    }
+    
+    select, textarea {
+        width: 100%;
+        padding: 12px 15px;
+        background-color: #252525;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        font-size: 1rem;
+        font-family: inherit;
+    }
+    
+    textarea {
+        width: 100%;
+        min-height: 180px;              
+        padding: 15px;
+        background-color: #252525;
+        border: 1px solid var(--border);
+        border-radius: 10px;             
+        color: var(--text);
+        font-size: 1rem;
+        font-family: inherit;
+        resize: vertical;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
+        background-color: #2a2a2a;       
     }
 
+    .form-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    
+    .btn {
+        background-color: var(--accent);
+        color: #121212;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn:hover {
+        background-color: var(--light-accent);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+    }
+    
+    /* отзывы */
+    .reviews-section {
+        margin-top: 40px;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        color: var(--light-accent);
+        margin-bottom: 25px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+    
+    .review-item {
+        background: linear-gradient(135deg, #252525 0%, #1e1e1e 100%);
+        border-radius: 12px;
+        padding: 25px;
+        border-left: 4px solid var(--accent);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .review-user {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .user-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: var(--accent);
+        color: #121212;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .username {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .review-rating {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(212, 175, 55, 0.15);
+        padding: 6px 15px;
+        border-radius: 30px;
+        font-weight: bold;
+    }
+    
+    .review-content {
+        line-height: 1.7;
+        margin-bottom: 15px;
+        color: #ddd;
+        font-size: 1.05rem;
+    }
+    
+    .review-date {
+        color: #888;
+        font-size: 0.9rem;
+        text-align: right;
+    }
+    
+    /* кнопка назад */
     .back-link {
-        display: block;
-        margin: 40px auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 25px;
+        background-color: #252525;
+        color: var(--accent);
+        border-radius: 30px;
+        margin: 40px 0;
+        transition: all 0.3s;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid var(--accent);
+    }
+    
+    .back-link:hover {
+        background-color: rgba(212, 175, 55, 0.15);
+        transform: translateX(-5px);
+    }
+    
+    /* модальное окно */
+    #loginModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background-color: #1e1e1e;
+        border-radius: 15px;
+        padding: 30px;
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid var(--accent);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .modal-title {
+        color: var(--light-accent);
+        margin-bottom: 20px;
         text-align: center;
+        font-size: 1.5rem;
+    }
+    
+    #modalLogin {
+        width: 100%;
+        padding: 14px;
+        background-color: #252525;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: white;
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+    
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+    }
+    
+    .modal-btn {
+        padding: 10px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .modal-btn.cancel {
+        background-color: #444;
+        color: white;
+        border: none;
+    }
+    
+    .modal-btn.submit {
+        background-color: var(--accent);
+        color: #121212;
+        border: none;
+    }
+    
+    .modal-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+    
+    /* адаптивность */
+    @media (max-width: 992px) {
+        .movie-container {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .movie-poster {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .rating-distribution {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .movie-title {
+            font-size: 2rem;
+        }
+        
+        .form-buttons, .modal-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn, .modal-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .rating-distribution {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -155,7 +555,7 @@
                 {{ end }}
             </select>
 
-            <button type="button" onclick="openLoginModal('ratingForm')">Оценить</button>
+            <button type="button" class="btn" onclick="openLoginModal('ratingForm')">Оценить</button>
         </form>
     </div>
 </div>
@@ -168,7 +568,7 @@
     <input type="hidden" name="rating" value="{{ .Rating }}">
 
     <textarea name="Comment" placeholder="Напишите отзыв..." required></textarea>
-    <button type="button" onclick="openLoginModal('reviewForm')">Оставить отзыв</button>
+    <button type="button" class="btn" onclick="openLoginModal('reviewForm')">Оставить отзыв</button>
 
 </form>
 
